@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net5.0-windows</TargetFramework>
+        <UseWPF>true</UseWPF>
+        <ApplicationIcon>images\icon.ico</ApplicationIcon>
+        <VersionPrefix>1.0.0.1</VersionPrefix>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Newtonsoft.Json" Version="12.0.3"/>
+        <Resource Include="images/i.png"/>
+        <Resource Include="images/x.png"/>
+        <Resource Include="images/icon.ico"/>
+    </ItemGroup>
+</Project>
