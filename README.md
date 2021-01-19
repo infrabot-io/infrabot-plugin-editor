@@ -4,7 +4,7 @@
 
 <h1 align="center">infrabot Plugin Editor - easily create, edit, modify your plugins</h1>
 <p align="center">
-  <img src="ipeio/assets/images/infrabot_gui.png" alt="infrabot-logo" width="120px" height="120px"/>
+  <img src="ipeio/assets/images/icon.png" alt="infrabot-logo" width="120px" height="120px"/>
   <br>
   <i>infrabot plugin editor is a tool which allows you to easily create, edit and modify plugins</i>
   <br>
