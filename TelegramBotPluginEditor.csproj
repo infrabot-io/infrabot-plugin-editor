@@ -14,6 +14,12 @@
         <Resource Include="images/i.png" />
         <Resource Include="images/x.png" />
         <Resource Include="images/save.png" />
+        <Resource Include="images/filesviewer/certificate.png" />
+        <Resource Include="images/filesviewer/config.png" />
+        <Resource Include="images/filesviewer/executable.png" />
+        <Resource Include="images/filesviewer/file.png" />
+        <Resource Include="images/filesviewer/folder.png" />
+        <Resource Include="images/filesviewer/image.png" />
     </ItemGroup>
     <ItemGroup>
       <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />

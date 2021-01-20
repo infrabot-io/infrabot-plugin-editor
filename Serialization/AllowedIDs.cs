@@ -1,6 +1,6 @@
 using System;
 
-namespace TelegramBotConfigEditor
+namespace TelegramBotPluginEditor
 {
     public class AllowedIDs
     {

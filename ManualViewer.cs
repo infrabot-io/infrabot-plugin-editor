@@ -1,7 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 
-namespace TelegramBotConfigEditor
+namespace TelegramBotPluginEditor
 {
     public partial class ManualViewer
     {
