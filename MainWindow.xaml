@@ -17,9 +17,10 @@
                 <MenuItem Header="_File">
                     <MenuItem Header="_New Plugin" Click="MainMenuNewPlugin_Click"/>
                     <MenuItem Header="_Open Plugin" Click="MainMenuOpenPlugin_Click"/>
-                    <MenuItem Header="_Save Plugin" Click="MainMenuSavePlugin_Click"/>
-                    <MenuItem Header="_Close Plugin" Click="MainMenuClosePlugin_Click"/>
+                    <MenuItem Header="_Save Plugin" Name="MainMenuSavePlugin" IsEnabled="false" Click="MainMenuSavePlugin_Click"/>
+                    <MenuItem Header="_Close Plugin" Name="MainMenuClosePlugin" IsEnabled="false" Click="MainMenuClosePlugin_Click"/>
                     <Separator/>
+                    <MenuItem Header="_New plugin.json file" Click="MainMenuNewFile_Click"/>
                     <MenuItem Header="_Open plugin.json file" Click="MainMenuOpenFile_Click"/>
                     <MenuItem Header="_Save plugin.json file" Name="MainMenuSaveFile" IsEnabled="false" Click="MainMenuSaveFile_Click"/>
                     <MenuItem Header="_Close plugin.json file" Name="MainMenuCloseFile" IsEnabled="false" Click="MainMenuCloseFile_Click"/>
@@ -247,7 +248,46 @@
                         </StackPanel>
                     </TabItem.Header>
                     <TabItem.Content>
-                        <TextBlock Text="a" VerticalAlignment="Center" />
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="42"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Rectangle Grid.Row="0" Grid.ColumnSpan="3" Fill="AliceBlue"/>
+                            <Grid Grid.Row="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="42"/>
+                                    <ColumnDefinition Width="42"/>
+                                    <ColumnDefinition Width="42"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Button Grid.Column="0" Margin="2" Height="36" Width="36" Click="PluginFilesListBoxRefresh">
+                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Horizontal" Background="Transparent">
+                                        <Image Source="images/filesviewer/refresh.png" Width="26" Height="26" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button Grid.Column="1" Margin="2" Height="36" Width="36">
+                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Horizontal" Background="Transparent">
+                                        <Image Source="images/filesviewer/newfolder.png" Width="26" Height="26" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+                            <ListView Name="PluginFilesListBox" Grid.Row="1" ItemsSource="{Binding DataSource}" Grid.IsSharedSizeScope="True">
+                                <ListView.View>
+                                    <GridView>
+                                        <GridViewColumn Header="" Width="32">
+                                            <GridViewColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Image Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Source="{Binding Icon}" />
+                                                </DataTemplate>
+                                            </GridViewColumn.CellTemplate>
+                                        </GridViewColumn>
+                                        <GridViewColumn Header="File" Width="160" DisplayMemberBinding="{Binding ItemName}"/>
+                                        <GridViewColumn Header="Extension" Width="64" DisplayMemberBinding="{Binding ItemExt}"/>
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
+                        </Grid>
                     </TabItem.Content>
                 </TabItem>
             </TabControl>
