@@ -227,18 +227,36 @@ namespace TelegramBotPluginEditor
                 }
             }
 
+            if (NewPluginCreating)
+            {
+                if (MessageBox.Show("Are you sure that you want to close this plugin? All changes will not be saved!", "Attention", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                {
+
+                }
+                else
+                {
+                    return;
+                }
+            }
+
             NewPluginCreating = true;
             MainPanelData.IsEnabled = true;
             MainPluginJsonData.IsEnabled = true;
             MainMenuSavePlugin.IsEnabled = true;
             MainMenuClosePlugin.IsEnabled = true;
             MainPluginFilesData.IsEnabled = true;
+            MainMenuSaveFile.IsEnabled = false;
+            MainMenuCloseFile.IsEnabled = false;
+            MainMenuNewPlugin.IsEnabled = true;
+            MainMenuOpenPlugin.IsEnabled = true;
+            MainMenuNewFile.IsEnabled = false;
+            MainMenuOpenFile.IsEnabled = false;
 
             try
             {
                 if (Directory.Exists(TempPluginPath))
                 {
-                    Directory.Delete(TempPluginPath);
+                    Directory.Delete(TempPluginPath, true);
                     WaitForDeletion(TempPluginPath);
                 }
 
@@ -253,16 +271,14 @@ namespace TelegramBotPluginEditor
                 this.Title = "infrabot - Plugin Editor * - Not Saved - New Plugin";
                 MainPanelData.IsEnabled = true;
                 MainPluginJsonData.IsEnabled = true;
-                MainMenuSaveFile.IsEnabled = true;
-                MainMenuCloseFile.IsEnabled = true;
                 MainPluginFilesData.IsEnabled = true;
                 NewPluginCreating = true;
                 NewFileCreating = false;
                 LoadNewPluginFolder(TempPluginPath);
             }
-            catch
+            catch (Exception ex)
             {
-
+                MessageBox.Show(ex.Message);
             }
         }
 
@@ -305,7 +321,7 @@ namespace TelegramBotPluginEditor
         private void InitFormWithCommand(Command command)
         {
             command_starts_with.Text = command.command_starts_with;
-
+            command_data_id_add_list.Items.Clear();
             foreach (int DataID in command.command_data_id)
             {
                 command_data_id_add_list.Items.Add(new AllowedIDs { ID = Convert.ToInt32(DataID) });
@@ -320,6 +336,7 @@ namespace TelegramBotPluginEditor
             command_default_error.Text = command.command_default_error;
             command_execute_type.SelectedIndex = command.command_execute_type - 1;
 
+            command_allowed_users_id_add_list.Items.Clear();
             foreach (int AllowedUser in command.command_allowed_users_id)
             {
                 command_allowed_users_id_add_list.Items.Add(new AllowedIDs { ID = Convert.ToInt32(AllowedUser) });
@@ -372,14 +389,15 @@ namespace TelegramBotPluginEditor
             CurrentFileViewerFolder = path;
 
             PluginFilesListBox.Items.Add(
-                    new TViewBinding
-                    {
-                        Icon = "",
-                        ItemName = "...",
-                        ItemExt = "",
-                        ItemPath = PreviousFileViewerFolder
-                    }
-                );
+                new TViewBinding
+                {
+                    Icon = "",
+                    ItemName = "...",
+                    ItemExt = "",
+                    ItemPath = PreviousFileViewerFolder,
+                    ItemIsFile = false
+                }
+            );
 
             foreach (var d in Directory.GetDirectories(path))
             {
@@ -392,7 +410,8 @@ namespace TelegramBotPluginEditor
                         Icon = "images/filesviewer/folder.png",
                         ItemName = dirName,
                         ItemExt = "",
-                        ItemPath = dir.FullName
+                        ItemPath = dir.FullName,
+                        ItemIsFile = false
                     }
                 );
             }
@@ -432,7 +451,9 @@ namespace TelegramBotPluginEditor
                     {
                         Icon = fileIcon,
                         ItemName = file.Name,
-                        ItemExt = file.Extension
+                        ItemExt = file.Extension,
+                        ItemPath = file.DirectoryName,
+                        ItemIsFile = true
                     }
                 );
             }

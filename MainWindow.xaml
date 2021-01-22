@@ -15,13 +15,13 @@
         <DockPanel Grid.Row="0">
             <Menu DockPanel.Dock="Top">
                 <MenuItem Header="_File">
-                    <MenuItem Header="_New Plugin" Click="MainMenuNewPlugin_Click"/>
-                    <MenuItem Header="_Open Plugin" Click="MainMenuOpenPlugin_Click"/>
+                    <MenuItem Header="_New Plugin" Name="MainMenuNewPlugin" Click="MainMenuNewPlugin_Click"/>
+                    <MenuItem Header="_Open Plugin" Name="MainMenuOpenPlugin" Click="MainMenuOpenPlugin_Click"/>
                     <MenuItem Header="_Save Plugin" Name="MainMenuSavePlugin" IsEnabled="false" Click="MainMenuSavePlugin_Click"/>
                     <MenuItem Header="_Close Plugin" Name="MainMenuClosePlugin" IsEnabled="false" Click="MainMenuClosePlugin_Click"/>
                     <Separator/>
-                    <MenuItem Header="_New plugin.json file" Click="MainMenuNewFile_Click"/>
-                    <MenuItem Header="_Open plugin.json file" Click="MainMenuOpenFile_Click"/>
+                    <MenuItem Header="_New plugin.json file" Name="MainMenuNewFile" Click="MainMenuNewFile_Click"/>
+                    <MenuItem Header="_Open plugin.json file" Name="MainMenuOpenFile" Click="MainMenuOpenFile_Click"/>
                     <MenuItem Header="_Save plugin.json file" Name="MainMenuSaveFile" IsEnabled="false" Click="MainMenuSaveFile_Click"/>
                     <MenuItem Header="_Close plugin.json file" Name="MainMenuCloseFile" IsEnabled="false" Click="MainMenuCloseFile_Click"/>
                     <Separator/>
