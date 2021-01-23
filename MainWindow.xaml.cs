@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Diagnostics;
 using System.IO;
 using Newtonsoft.Json;
@@ -21,6 +22,7 @@ namespace TelegramBotPluginEditor
         string PluginJsonTemplate = "{ \"command_starts_with\": \"/sayhello\", \"command_data_id\": [ 2 ], \"command_execute_file\": \"sayhello.ps1\", \"command_help_manual\": \"Says hello. Write `/sayhello John` to say hello\", \"command_help_short\": \"Says hello\", \"command_author\": \"infrabot.io\", \"command_version\": \"1.0.0.0\", \"command_website\": \"https://infrabot.io\", \"command_default_error\": \"Saying hello to `{DATA}` was not succeded! Unexpected error! Result was: {RESULT}\", \"command_execute_type\": 3, \"command_allowed_users_id\": [], \"command_allowed_chats_id\": [], \"command_show_in_get_commands_list\": true, \"command_execute_results\": [ { \"result_value\": \"0\", \"result_output\": \"User `{DATA}` was not disabled! User name was not sent as an argument to script\", \"result_checktype\": 1 } ] }";
         string CurrentFileViewerFolder = "";
         string PreviousFileViewerFolder = "";
+        List<string> FileViewerFolderHistory = new List<string>();
 
         public MainWindow()
         {
@@ -274,6 +276,8 @@ namespace TelegramBotPluginEditor
                 MainPluginFilesData.IsEnabled = true;
                 NewPluginCreating = true;
                 NewFileCreating = false;
+                CurrentFileViewerFolder = TempPluginPath;
+                FileViewerFolderHistory.Add(TempPluginPath);
                 LoadNewPluginFolder(TempPluginPath);
             }
             catch (Exception ex)
@@ -285,6 +289,34 @@ namespace TelegramBotPluginEditor
         private void ChangeCheckItemClick(object sender, RoutedEventArgs e)
         {
             // not implemented
+        }
+
+        protected void PluginFilesListBoxItemDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            try
+            {
+                if (PluginFilesListBox.SelectedItems.Count == 1)
+                {
+                    TViewBinding tvb = (PluginFilesListBox.SelectedItem as TViewBinding);
+                    if (!tvb.ItemIsFile)
+                    {
+                        if (tvb.ItemName.ToLower().Equals("..."))
+                        {
+                            if (FileViewerFolderHistory.Count > 1)
+                            {
+                                FileViewerFolderHistory.RemoveAt(FileViewerFolderHistory.Count - 1);
+                            }
+                            LoadNewPluginFolder(FileViewerFolderHistory[FileViewerFolderHistory.Count - 1]);
+                        }
+                        else
+                        {
+                            FileViewerFolderHistory.Add(tvb.ItemPath);
+                            LoadNewPluginFolder(tvb.ItemPath);
+                        }
+                    }
+                }
+            }
+            catch { }
         }
 
         private void AddItemToList(object sender, RoutedEventArgs e)
@@ -303,6 +335,41 @@ namespace TelegramBotPluginEditor
         private void PluginFilesListBoxRefresh(object sender, RoutedEventArgs e)
         {
             LoadNewPluginFolder(CurrentFileViewerFolder);
+        }
+
+        private void PluginFilesListBoxDeleteItem(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                foreach (TViewBinding item in PluginFilesListBox.SelectedItems)
+                {
+                    TViewBinding tvb = (item as TViewBinding);
+                    if (tvb.ItemName.ToLower().Equals("plugin.json"))
+                    {
+                        MessageBox.Show("You can not delete main plugin.json file, because it is main entry point of plugin. Please read manual on website!");
+                        continue;
+                    }
+                    if (tvb.ItemName.ToLower().Equals("..."))
+                    {
+                        continue;
+                    }
+                    if (tvb.ItemIsFile)
+                    {
+                        File.Delete(tvb.ItemPath + @"\" + tvb.ItemName);
+                    }
+                    else
+                    {
+                        Directory.Delete(tvb.ItemPath, true);
+                    }
+                }
+            }
+            catch { }
+            LoadNewPluginFolder(CurrentFileViewerFolder);
+        }
+
+        private void PluginFilesListBoxOpenFolder(object sender, RoutedEventArgs e)
+        {
+            Process.Start("explorer.exe", TempPluginPath);
         }
 
         private void DeleteItemList(object sender, RoutedEventArgs e)
@@ -387,7 +454,6 @@ namespace TelegramBotPluginEditor
             PluginFilesListBox.Items.Clear();
             PreviousFileViewerFolder = CurrentFileViewerFolder;
             CurrentFileViewerFolder = path;
-
             PluginFilesListBox.Items.Add(
                 new TViewBinding
                 {

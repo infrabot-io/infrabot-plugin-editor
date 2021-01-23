@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:TelegramBotPluginEditor"
         mc:Ignorable="d"
         Title="infrabot - Plugin Editor" Height="450" Width="800" WindowStartupLocation="CenterScreen" Icon="images/icon.ico">
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="24"/>
@@ -259,6 +260,8 @@
                                     <ColumnDefinition Width="42"/>
                                     <ColumnDefinition Width="42"/>
                                     <ColumnDefinition Width="42"/>
+                                    <ColumnDefinition Width="42"/>
+                                    <ColumnDefinition Width="42"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <Button Grid.Column="0" Margin="2" Height="36" Width="36" Click="PluginFilesListBoxRefresh">
@@ -266,13 +269,19 @@
                                         <Image Source="images/filesviewer/refresh.png" Width="26" Height="26" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                     </StackPanel>
                                 </Button>
-                                <Button Grid.Column="1" Margin="2" Height="36" Width="36">
+                                <Button Grid.Column="1" Margin="2" Height="36" Width="36" Click="PluginFilesListBoxDeleteItem">
                                     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Horizontal" Background="Transparent">
-                                        <Image Source="images/filesviewer/newfolder.png" Width="26" Height="26" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        <Image Source="images/filesviewer/delete.png" Width="26" Height="26" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button Grid.Column="2" Margin="2" Height="36" Width="36" Click="PluginFilesListBoxOpenFolder">
+                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Horizontal" Background="Transparent">
+                                        <Image Source="images/filesviewer/folder.png" Width="26" Height="26" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                     </StackPanel>
                                 </Button>
                             </Grid>
-                            <ListView Name="PluginFilesListBox" Grid.Row="1" ItemsSource="{Binding DataSource}" Grid.IsSharedSizeScope="True">
+                            
+                            <ListView Name="PluginFilesListBox" Grid.Row="1" ItemsSource="{Binding DataSource}" Grid.IsSharedSizeScope="True" MouseDoubleClick="PluginFilesListBoxItemDoubleClick">
                                 <ListView.View>
                                     <GridView>
                                         <GridViewColumn Header="" Width="32">
