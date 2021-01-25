@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
@@ -115,7 +116,40 @@ namespace TelegramBotPluginEditor
 
         private void MainMenuSavePlugin_Click(object sender, RoutedEventArgs e)
         {
+            Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog();
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                command.command_starts_with = command_starts_with.Text;
+                List<int> command_data_id_array = new List<int> { };
+                foreach (AllowedIDs id in command_data_id_add_list.Items)
+                {
+                    command_data_id_array.Add(id.ID);
+                }
+                command.command_data_id = command_data_id_array;
 
+                command.command_execute_file = command_execute_file.Text;
+                command.command_help_manual = command_help_manual.Text;
+                command.command_help_short = command_help_short.Text;
+                command.command_author = command_author.Text;
+                command.command_version = command_version.Text;
+                command.command_website = command_website.Text;
+                command.command_default_error = command_default_error.Text;
+                command.command_execute_type = command_execute_type.SelectedIndex + 1;
+
+                List<int> command_allowed_users_id_array = new List<int> { };
+                foreach (AllowedIDs id in command_allowed_users_id_add_list.Items)
+                {
+                    command_allowed_users_id_array.Add(id.ID);
+                }
+                command.command_allowed_users_id = command_allowed_users_id_array;
+
+                command.command_show_in_get_commands_list = (bool)command_show_in_get_commands_list.IsChecked;
+
+                string command_serialized = JsonConvert.SerializeObject(command);
+                File.WriteAllText(TempPluginPath + @"\" + "plugin.json", command_serialized);
+                ZipFile.CreateFromDirectory(TempPluginPath, saveFileDialog.FileName);
+                this.Title = "infrabot - Plugin Editor - " + saveFileDialog.FileName;
+            }
         }
 
         private void MainMenuClosePlugin_Click(object sender, RoutedEventArgs e)
@@ -319,6 +353,32 @@ namespace TelegramBotPluginEditor
             catch { }
         }
 
+        private void PluginFilesListBoxDrop(object sender, DragEventArgs e)
+        {
+            try
+            {
+                if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                {
+                    var files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                    foreach (var file in files)
+                    {
+                        var f = new FileInfo(file);
+                        File.Copy(f.FullName, CurrentFileViewerFolder + @"\" + f.Name, true);
+                        LoadNewPluginFolder(CurrentFileViewerFolder);
+                    }
+                }
+            }
+            catch { }
+        }
+
+        private void PluginFilesListBoxDropKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Delete)
+            {
+                DeleteItemsFromPluginFolder();
+            }
+        }
+
         private void AddItemToList(object sender, RoutedEventArgs e)
         {
             try
@@ -339,32 +399,7 @@ namespace TelegramBotPluginEditor
 
         private void PluginFilesListBoxDeleteItem(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                foreach (TViewBinding item in PluginFilesListBox.SelectedItems)
-                {
-                    TViewBinding tvb = (item as TViewBinding);
-                    if (tvb.ItemName.ToLower().Equals("plugin.json"))
-                    {
-                        MessageBox.Show("You can not delete main plugin.json file, because it is main entry point of plugin. Please read manual on website!");
-                        continue;
-                    }
-                    if (tvb.ItemName.ToLower().Equals("..."))
-                    {
-                        continue;
-                    }
-                    if (tvb.ItemIsFile)
-                    {
-                        File.Delete(tvb.ItemPath + @"\" + tvb.ItemName);
-                    }
-                    else
-                    {
-                        Directory.Delete(tvb.ItemPath, true);
-                    }
-                }
-            }
-            catch { }
-            LoadNewPluginFolder(CurrentFileViewerFolder);
+            DeleteItemsFromPluginFolder();
         }
 
         private void PluginFilesListBoxOpenFolder(object sender, RoutedEventArgs e)
@@ -523,6 +558,36 @@ namespace TelegramBotPluginEditor
                     }
                 );
             }
+        }
+
+        private void DeleteItemsFromPluginFolder()
+        {
+            try
+            {
+                foreach (TViewBinding item in PluginFilesListBox.SelectedItems)
+                {
+                    TViewBinding tvb = (item as TViewBinding);
+                    if (tvb.ItemName.ToLower().Equals("plugin.json"))
+                    {
+                        MessageBox.Show("You can not delete main plugin.json file, because it is main entry point of plugin. Please read manual on website!");
+                        continue;
+                    }
+                    if (tvb.ItemName.ToLower().Equals("..."))
+                    {
+                        continue;
+                    }
+                    if (tvb.ItemIsFile)
+                    {
+                        File.Delete(tvb.ItemPath + @"\" + tvb.ItemName);
+                    }
+                    else
+                    {
+                        Directory.Delete(tvb.ItemPath, true);
+                    }
+                }
+            }
+            catch { }
+            LoadNewPluginFolder(CurrentFileViewerFolder);
         }
     }
 }

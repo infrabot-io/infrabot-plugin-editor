@@ -281,7 +281,7 @@
                                 </Button>
                             </Grid>
                             
-                            <ListView Name="PluginFilesListBox" Grid.Row="1" ItemsSource="{Binding DataSource}" Grid.IsSharedSizeScope="True" MouseDoubleClick="PluginFilesListBoxItemDoubleClick">
+                            <ListView Name="PluginFilesListBox" Grid.Row="1" ItemsSource="{Binding DataSource}" Grid.IsSharedSizeScope="True" MouseDoubleClick="PluginFilesListBoxItemDoubleClick" Drop="PluginFilesListBoxDrop" AllowDrop="True" KeyDown="PluginFilesListBoxDropKeyDown">
                                 <ListView.View>
                                     <GridView>
                                         <GridViewColumn Header="" Width="32">
