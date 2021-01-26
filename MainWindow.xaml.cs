@@ -38,7 +38,7 @@ namespace TelegramBotPluginEditor
 
         private void MainMenuInfrabotIO_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start("https://infrabot.io");
+            Process.Start(new ProcessStartInfo("https://infrabot.io") { UseShellExecute = true });
         }
 
         private void ShowInfo_Click(object sender, RoutedEventArgs e)
@@ -49,7 +49,7 @@ namespace TelegramBotPluginEditor
 
         private void MainMenuDocumentation_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start("https://infrabot.io/documentation");
+            Process.Start(new ProcessStartInfo("https://infrabot.io/documentation") { UseShellExecute = true });
         }
 
         private void MainMenuExit_Click(object sender, RoutedEventArgs e)
@@ -82,6 +82,15 @@ namespace TelegramBotPluginEditor
                 MainPluginFilesData.IsEnabled = false;
                 MainMenuSaveFile.IsEnabled = false;
                 MainMenuCloseFile.IsEnabled = false;
+
+                MainMenuNewPlugin.IsEnabled = true;
+                MainMenuOpenPlugin.IsEnabled = true;
+                MainMenuSavePlugin.IsEnabled = false;
+                MainMenuClosePlugin.IsEnabled = false;
+
+                MainMenuNewFile.IsEnabled = true;
+                MainMenuOpenFile.IsEnabled = true;
+
                 MainPluginJsonDataScroll.ScrollToTop();
                 NewFileCreating = false;
                 CleanFormData();
@@ -90,11 +99,11 @@ namespace TelegramBotPluginEditor
 
         private void MainMenuNewFile_Click(object sender, RoutedEventArgs e)
         {
-            if (NewPluginCreating)
+            if (NewFileCreating)
             {
-                if (MessageBox.Show("Are you sure that you want to close this plugin? All changes will not be saved!", "Attention", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                if (MessageBox.Show("Are you sure that you want to close this file? All changes will not be saved!", "Attention", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                 {
-                    NewPluginCreating = false;
+                    NewFileCreating = false;
                 }
                 else
                 {
@@ -102,11 +111,21 @@ namespace TelegramBotPluginEditor
                 }
             }
 
-            NewFileCreating = true;
+            MainMenuNewPlugin.IsEnabled = false;
+            MainMenuOpenPlugin.IsEnabled = false;
+            MainMenuNewFile.IsEnabled = true;
+            MainMenuOpenFile.IsEnabled = true;
+            MainPluginFilesData.IsEnabled = false;
             MainPluginJsonData.IsEnabled = true;
+            MainMenuSavePlugin.IsEnabled = false;
+            MainMenuClosePlugin.IsEnabled = false;
+            MainPanelData.IsEnabled = true;
             MainMenuSaveFile.IsEnabled = true;
             MainMenuCloseFile.IsEnabled = true;
-            MainPluginFilesData.IsEnabled = true;
+
+            command = JsonConvert.DeserializeObject<Command>(PluginJsonTemplate);
+            InitFormWithCommand(command);
+            this.Title = "infrabot - Plugin Editor * - Not Saved - New plugin.json file";
         }
 
         private void MainMenuOpenPlugin_Click(object sender, RoutedEventArgs e)
@@ -117,6 +136,7 @@ namespace TelegramBotPluginEditor
         private void MainMenuSavePlugin_Click(object sender, RoutedEventArgs e)
         {
             Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog();
+            saveFileDialog.Filter = "Plugin Files (*.plug)|*.plug";
             if (saveFileDialog.ShowDialog() == true)
             {
                 command.command_starts_with = command_starts_with.Text;
@@ -154,7 +174,43 @@ namespace TelegramBotPluginEditor
 
         private void MainMenuClosePlugin_Click(object sender, RoutedEventArgs e)
         {
+            if (NewPluginCreating)
+            {
+                if (MessageBox.Show("Are you sure that you want to close this plugin? All changes will not be saved!", "Attention", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                {
+                    NewPluginCreating = false;
+                }
+                else
+                {
+                    return;
+                }
+            }
 
+            CleanFormData();
+            command = null;
+
+            MainMenuNewPlugin.IsEnabled = true;
+            MainMenuOpenPlugin.IsEnabled = true;
+            MainMenuNewFile.IsEnabled = true;
+            MainMenuOpenFile.IsEnabled = true;
+            MainPluginFilesData.IsEnabled = false;
+            MainPluginJsonData.IsEnabled = false;
+            MainMenuSavePlugin.IsEnabled = false;
+            MainMenuClosePlugin.IsEnabled = false;
+            MainPanelData.IsEnabled = false;
+            MainMenuSaveFile.IsEnabled = false;
+            MainMenuCloseFile.IsEnabled = false;
+            MainPluginJsonDataScroll.ScrollToTop();
+
+            try
+            {
+                if (Directory.Exists(TempPluginPath))
+                {
+                    Directory.Delete(TempPluginPath, true);
+                    WaitForDeletion(TempPluginPath);
+                }
+            }
+            catch { }
         }
 
         private void MainMenuOpenFile_Click(object sender, RoutedEventArgs e)
@@ -164,18 +220,6 @@ namespace TelegramBotPluginEditor
                 if (MessageBox.Show("Are you sure that you want to close this file? All changes will not be saved!", "Attention", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                 {
 
-                }
-                else
-                {
-                    return;
-                }
-            }
-
-            if (NewPluginCreating)
-            {
-                if (MessageBox.Show("Are you sure that you want to close this plugin? All changes will not be saved!", "Attention", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-                {
-                    NewPluginCreating = false;
                 }
                 else
                 {
@@ -202,6 +246,10 @@ namespace TelegramBotPluginEditor
                     MainMenuSaveFile.IsEnabled = true;
                     MainMenuCloseFile.IsEnabled = true;
                     MainPluginFilesData.IsEnabled = false;
+                    MainMenuNewPlugin.IsEnabled = false;
+                    MainMenuOpenPlugin.IsEnabled = false;
+                    MainMenuSavePlugin.IsEnabled = false;
+                    MainMenuClosePlugin.IsEnabled = false;
                     NewFileCreating = true;
                 }
                 catch (Exception ex)
@@ -215,6 +263,7 @@ namespace TelegramBotPluginEditor
         private void MainMenuSaveFile_Click(object sender, RoutedEventArgs e)
         {
             Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog();
+            saveFileDialog.Filter = "Config Files (*.json)|*.json";
             if (saveFileDialog.ShowDialog() == true)
             {
                 command.command_starts_with = command_starts_with.Text;
@@ -377,6 +426,10 @@ namespace TelegramBotPluginEditor
             {
                 DeleteItemsFromPluginFolder();
             }
+            if (e.Key == Key.F5)
+            {
+                LoadNewPluginFolder(CurrentFileViewerFolder);
+            }
         }
 
         private void AddItemToList(object sender, RoutedEventArgs e)
@@ -471,6 +524,8 @@ namespace TelegramBotPluginEditor
             command_allowed_users_id_add_list.Items.Clear();
             command_show_in_get_commands_list.IsChecked = false;
             command_show_in_get_commands_list.Content = "False";
+            MainTabControl.SelectedItem = MainPluginJsonData;
+            PluginFilesListBox.Items.Clear();
         }
 
         private static void WaitForDeletion(string directoryName)
