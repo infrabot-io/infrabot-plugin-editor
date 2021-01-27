@@ -130,7 +130,74 @@ namespace TelegramBotPluginEditor
 
         private void MainMenuOpenPlugin_Click(object sender, RoutedEventArgs e)
         {
+            if (NewPluginCreating)
+            {
+                if (MessageBox.Show("Are you sure that you want to close this plugin? All changes will not be saved!", "Attention", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                {
+                    NewPluginCreating = false;
+                }
+                else
+                {
+                    return;
+                }
+            }
 
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            dlg.DefaultExt = ".plug";
+            dlg.Filter = "Plugin Files (*.plug)|*.plug";
+            Nullable<bool> result = dlg.ShowDialog();
+            if (result == true)
+            {
+                try
+                {
+                    if (Directory.Exists(TempPluginPath))
+                    {
+                        Directory.Delete(TempPluginPath, true);
+                        WaitForDeletion(TempPluginPath);
+                    }
+                    ZipFile.ExtractToDirectory(dlg.FileName, TempPluginPath);
+                    JsonPluginFile = "";
+                    command = null;
+                    JsonPluginFile = File.ReadAllText(TempPluginPath + @"\" + "plugin.json");
+                    command = JsonConvert.DeserializeObject<Command>(JsonPluginFile);
+                    InitFormWithCommand(command);
+                    this.Title = "infrabot - Plugin Editor * - Not Saved - " + dlg.FileName;
+                    MainPanelData.IsEnabled = true;
+                    MainPluginJsonData.IsEnabled = true;
+                    MainMenuNewFile.IsEnabled = false;
+                    MainMenuOpenFile.IsEnabled = false;
+                    MainMenuSaveFile.IsEnabled = false;
+                    MainMenuCloseFile.IsEnabled = false;
+                    MainPluginFilesData.IsEnabled = true;
+                    MainMenuNewPlugin.IsEnabled = true;
+                    MainMenuOpenPlugin.IsEnabled = true;
+                    MainMenuSavePlugin.IsEnabled = true;
+                    MainMenuClosePlugin.IsEnabled = true;
+                    NewPluginCreating = true;
+                    LoadNewPluginFolder(TempPluginPath);
+                }
+                catch
+                {
+                    NewPluginCreating = false;
+                    this.Title = "infrabot - Plugin Editor";
+                    command = null;
+                    JsonPluginFile = "";
+                    MainPanelData.IsEnabled = false;
+                    MainPluginJsonData.IsEnabled = false;
+                    MainPluginFilesData.IsEnabled = false;
+                    MainMenuSaveFile.IsEnabled = false;
+                    MainMenuCloseFile.IsEnabled = false;
+                    MainMenuNewPlugin.IsEnabled = true;
+                    MainMenuOpenPlugin.IsEnabled = true;
+                    MainMenuSavePlugin.IsEnabled = false;
+                    MainMenuClosePlugin.IsEnabled = false;
+                    MainMenuNewFile.IsEnabled = true;
+                    MainMenuOpenFile.IsEnabled = true;
+                    MainPluginJsonDataScroll.ScrollToTop();
+                    CleanFormData();
+                    MessageBox.Show("This is not an infrabot plugin file!");
+                }
+            }
         }
 
         private void MainMenuSavePlugin_Click(object sender, RoutedEventArgs e)
